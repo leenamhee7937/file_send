@@ -16,10 +16,10 @@ today_date = datetime.now().strftime("%Y-%m-%d")
 st.markdown(f"📅 **날짜**: `{today_date}`")
 
 # 수업 정보 입력
-topic = st.text_input("📝 수업 주제 (40자 이내)", max_chars=40)
-content = st.text_area("📚 수업 내용 (200자 이내)", max_chars=200, height=100)
-learning = st.text_area("🔍 학습 내용 (200자 이내)", max_chars=200, height=100)
-future = st.text_area("🚀 향후 발전 방향 (200자 이내)", max_chars=200, height=100)
+topic = st.text_input("📝 수업 주제", max_chars=50)
+content = st.text_area("📚 수업 내용 요약 (100자 내외)", max_chars=200, height=100)
+learning = st.text_area("🔍 학습 과정 및 배움 (태도, 협력, 노력 과정 위주로 200자 내외)", max_chars=200, height=100)
+future = st.text_area("🚀 향후 발전 방향 및 더 탐구해보고 싶은 부분 (200자 내외)", max_chars=200, height=100)
 
 # 저장 버튼
 if st.button("💾 저장하기"):
