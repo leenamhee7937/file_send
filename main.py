@@ -11,7 +11,7 @@ def get_client_ip():
     except:
         return "알 수 없음"
 
-st.title("📄 과제 제출 시스템")
+st.title("📄 정보 과제 파일 제출")
 
 # ✅ 1~9반 선택 드롭다운
 selected_class = st.selectbox("🏫 반을 선택하세요:", [f"{i}반" for i in range(1, 10)])
