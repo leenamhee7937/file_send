@@ -38,7 +38,7 @@ def generate_pdf(student_id, name, topic, content, learning, development):
 
     # 항목별 박스
     def section(title, content):
-        pdf.set_font('NotoSans', 'B', 12)
+        pdf.set_font('NotoSans', '', 12)
         pdf.cell(0, 10, title, ln=True)
         pdf.set_font('NotoSans', '', 12)
         pdf.multi_cell(0, 10, content, border=1)
