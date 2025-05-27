@@ -12,7 +12,7 @@ def get_client_ip():
         return "알 수 없음"
 
 st.title("📄 정보 과제 파일 제출")
-st.header("📌 제출 컴퓨터의 ip도 함께 기록됩니다. 제출 기회 한 번입니다.")
+st.markdown("📌 제출 컴퓨터의 ip도 함께 기록됩니다. 제출 기회 한 번입니다.")
 
 # ✅ 1~9반 선택 드롭다운
 selected_class = st.selectbox("🏫 반을 선택하세요:", [f"{i}반" for i in range(1, 10)])
