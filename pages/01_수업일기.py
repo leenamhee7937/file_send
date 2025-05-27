@@ -17,20 +17,42 @@ def generate_pdf(student_id, name, topic, content, learning, development):
     pdf.add_font('NotoSans', '', font_path, uni=True)
     pdf.set_font('NotoSans', '', 14)
 
-    pdf.cell(200, 10, txt="수업 일기", ln=True, align='C')
-    pdf.ln(10)
-    pdf.cell(200, 10, txt=f"학번: {student_id}", ln=True)
-    pdf.cell(200, 10, txt=f"이름: {name}", ln=True)
-    pdf.cell(200, 10, txt=f"날짜: {datetime.today().strftime('%Y-%m-%d')}", ln=True)
-    pdf.ln(5)
-    pdf.multi_cell(0, 10, f"수업 주제: {topic}")
-    pdf.multi_cell(0, 10, f"수업 내용: {content}")
-    pdf.multi_cell(0, 10, f"학습 내용: {learning}")
-    pdf.multi_cell(0, 10, f"향후 발전 방향: {development}")
+    pdf.set_fill_color(240, 240, 240)  # 연회색 박스 배경
 
-    # PDF 바이트로 반환
+    # 제목
+    pdf.cell(0, 10, txt="수업 일기", ln=True, align='C')
+
+    pdf.ln(5)
+
+    # 기본 정보 (학번, 이름, 날짜)
+    pdf.cell(40, 10, "학번", border=1, fill=True)
+    pdf.cell(150, 10, student_id, border=1, ln=True)
+
+    pdf.cell(40, 10, "이름", border=1, fill=True)
+    pdf.cell(150, 10, name, border=1, ln=True)
+
+    pdf.cell(40, 10, "날짜", border=1, fill=True)
+    pdf.cell(150, 10, datetime.today().strftime('%Y-%m-%d'), border=1, ln=True)
+
+    pdf.ln(5)
+
+    # 항목별 박스
+    def section(title, content):
+        pdf.set_font('NotoSans', 'B', 12)
+        pdf.cell(0, 10, title, ln=True)
+        pdf.set_font('NotoSans', '', 12)
+        pdf.multi_cell(0, 10, content, border=1)
+        pdf.ln(3)
+
+    section("📌 수업 주제", topic)
+    section("📖 수업 내용", content)
+    section("🧠 학습 내용", learning)
+    section("🌱 향후 발전 방향", development)
+
+    # PDF 바이트 반환
     pdf_bytes = pdf.output(dest='S').encode('latin1')
     return io.BytesIO(pdf_bytes)
+
 
 # Streamlit UI
 st.title("📘 수업 일기 작성")
