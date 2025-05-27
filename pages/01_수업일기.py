@@ -4,10 +4,10 @@ import os
 from datetime import datetime
 
 # 저장할 폴더 생성
-save_folder = "C:/학급일지"
+save_folder = "C:/수업일기"
 os.makedirs(save_folder, exist_ok=True)
 
-st.title("📘 학급 일지 작성")
+st.title("📘 수업 일기 작성")
 
 # 기본 입력
 student_number = st.text_input("🔢 학번", max_chars=10)
@@ -36,7 +36,7 @@ if st.button("💾 저장하기"):
         pdf.add_font('ArialUnicode', '', 'arialuni.ttf', uni=True)  # 한글 폰트 필요 시 추가
         pdf.set_font("ArialUnicode", size=12)
 
-        pdf.cell(200, 10, txt="📘 학급 일지", ln=True, align="C")
+        pdf.cell(200, 10, txt="📘 수업 일기", ln=True, align="C")
         pdf.ln(10)
         pdf.cell(200, 10, txt=f"학번: {student_number}   이름: {student_name}   날짜: {today_date}", ln=True)
         pdf.ln(5)
