@@ -4,10 +4,10 @@ import requests
 from datetime import datetime
 
 # 과제 저장 폴더 설정
-save_folder = "C:/과제물"
+save_folder = "C:/1반"
 os.makedirs(save_folder, exist_ok=True)
 
-st.title("📄 과제 제출 시스템")
+st.title("📄 정보 과제 제출(같은 학번 중복 제출은 불가함")
 
 # 사용자 외부 IP 가져오기
 def get_client_ip():
