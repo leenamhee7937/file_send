@@ -4,12 +4,10 @@ from datetime import datetime
 import os
 import io
 
-# PDF 저장 함수
 def generate_pdf(student_id, name, topic, content, learning, development):
     pdf = FPDF()
     pdf.add_page()
 
-    # 폰트 경로 지정
     font_path = "NotoSansKR-Regular.ttf"
     if not os.path.exists(font_path):
         st.error(f"❌ 폰트 파일이 없습니다: {font_path}")
@@ -29,11 +27,12 @@ def generate_pdf(student_id, name, topic, content, learning, development):
     pdf.multi_cell(0, 10, f"학습 내용: {learning}")
     pdf.multi_cell(0, 10, f"향후 발전 방향: {development}")
 
-    # 메모리 버퍼에 PDF 저장
-    pdf_buffer = io.BytesIO()
-    pdf.output(pdf_buffer)
-    pdf_buffer.seek(0)
+    # 문자열로 반환 후 BytesIO로 변환
+    pdf_bytes = pdf.output(dest='S').encode('latin1')
+    pdf_buffer = io.BytesIO(pdf_bytes)
     return pdf_buffer
+
+
 
 # Streamlit UI
 st.title("📘 수업 일기 작성")
