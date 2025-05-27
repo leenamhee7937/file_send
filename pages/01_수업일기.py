@@ -3,6 +3,7 @@ import streamlit as st
 from datetime import datetime
 import os
 import io
+from pathlib import Path
 
 def generate_pdf(student_id, name, topic, content, learning, development):
     pdf = FPDF()
@@ -59,14 +60,14 @@ if st.button("저장하기"):
             )
 
             # 📤 제출 버튼
-            if st.button("📤 PDF 제출 (C:\\수업일기에 저장)"):
-                save_path = os.path.join("C:\\수업일기", filename)
+            if st.button("📤 PDF 제출 (문서 > ClassDiary 폴더에 저장)"):
+                # 사용자 문서 폴더에 저장
+                save_dir = Path.home() / "Documents" / "ClassDiary"
+                save_dir.mkdir(parents=True, exist_ok=True)
+                save_path = save_dir / filename
 
-                # 디렉터리가 없으면 생성
-                os.makedirs(os.path.dirname(save_path), exist_ok=True)
-
-                # 파일로 저장
+                # 저장
                 with open(save_path, "wb") as f:
                     f.write(pdf_file.getbuffer())
 
-                st.success(f"📂 PDF가 C:\\수업일기 폴더에 저장되었습니다.\n\n→ {save_path}")
+                st.success(f"📂 PDF가 저장되었습니다:\n\n→ {save_path}")
