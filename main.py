@@ -26,4 +26,7 @@ if st.button("제출하기"):
         save_path = os.path.join(save_folder, filename)
 
         # 파일 저장
-        with open
+        with open(save_path, "wb") as f:
+            f.write(uploaded_file.read())
+
+        st.success(f"✅ 제출 완료! 파일이 다음 위치에 저장되었습니다: {save_path}")
