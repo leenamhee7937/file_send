@@ -8,7 +8,7 @@ def generate_pdf(student_id, name, topic, content, learning, development):
     pdf = FPDF()
     pdf.add_page()
 
-    font_path = "NotoSansKR-Regular.ttf"
+    font_path = os.path.join(os.path.dirname(__file__), "NotoSansKR-Regular.ttf")
     if not os.path.exists(font_path):
         st.error(f"❌ 폰트 파일이 없습니다: {font_path}")
         return None
@@ -27,12 +27,9 @@ def generate_pdf(student_id, name, topic, content, learning, development):
     pdf.multi_cell(0, 10, f"학습 내용: {learning}")
     pdf.multi_cell(0, 10, f"향후 발전 방향: {development}")
 
-    # 문자열로 반환 후 BytesIO로 변환
+    # PDF 바이트로 반환
     pdf_bytes = pdf.output(dest='S').encode('latin1')
-    pdf_buffer = io.BytesIO(pdf_bytes)
-    return pdf_buffer
-
-
+    return io.BytesIO(pdf_bytes)
 
 # Streamlit UI
 st.title("📘 수업 일기 작성")
@@ -52,9 +49,24 @@ if st.button("저장하기"):
         if pdf_file:
             filename = f"{student_id}_{name}_수업일지.pdf"
             st.success("✅ PDF가 생성되었습니다.")
+
+            # 📥 다운로드 버튼
             st.download_button(
                 label="📥 PDF 다운로드",
                 data=pdf_file,
                 file_name=filename,
                 mime="application/pdf"
             )
+
+            # 📤 제출 버튼
+            if st.button("📤 PDF 제출 (C:\\수업일기에 저장)"):
+                save_path = os.path.join("C:\\수업일기", filename)
+
+                # 디렉터리가 없으면 생성
+                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+                # 파일로 저장
+                with open(save_path, "wb") as f:
+                    f.write(pdf_file.getbuffer())
+
+                st.success(f"📂 PDF가 C:\\수업일기 폴더에 저장되었습니다.\n\n→ {save_path}")
