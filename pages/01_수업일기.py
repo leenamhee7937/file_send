@@ -9,13 +9,11 @@ def generate_pdf(student_id, name, topic, content, learning, development):
     pdf = FPDF()
     pdf.add_page()
 
-    font_path = os.path.join(os.path.dirname(__file__), "NotoSansKR-Regular.ttf")
-    if not os.path.exists(font_path):
-        st.error(f"❌ 폰트 파일이 없습니다: {font_path}")
-        return None
 
-    pdf.add_font('NotoSans', '', font_path, uni=True)
-    pdf.set_font('NotoSans', '', 14)
+font_path = os.path.join(os.path.dirname(__file__), "NotoSansKR-Regular.ttf")
+pdf.add_font('NotoSans', '', font_path, uni=True)
+    
+
 
     pdf.set_fill_color(240, 240, 240)  # 연회색 박스 배경
 
