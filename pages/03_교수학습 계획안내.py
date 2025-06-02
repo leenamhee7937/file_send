@@ -123,7 +123,7 @@ with st.expander("📊 계획 엑셀 다운로드"):
         st.download_button(
             label="📥 Excel 다운로드",
             data=excel_file,
-            file_name="2025_학습계획표.xlsx",
+            file_name="월주교수학습계획.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
     else:
