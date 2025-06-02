@@ -24,7 +24,8 @@ def generate_pdf(student_id, name, topic, content, learning, development):
     pdf.ln(5)
     pdf.multi_cell(0, 10, f"수업 주제: {topic}")
     pdf.multi_cell(0, 10, f"수업 내용: {content}")
-    pdf.multi_cell(0, 10, f"활동 및 참여내용: {learning}")
+    pdf.multi_cell(0, 10, f"활동 및 참여내용: {acting}")
+    pdf.multi_cell(0, 10, f"느낀점, 배운점(오늘 나의 태도 / 협력 / 질문 / 노력 등): {learning}")
     pdf.multi_cell(0, 10, f"향후 발전 방향: {development}")
 
     # 문자열로 반환 후 BytesIO로 변환
@@ -41,7 +42,8 @@ student_id = st.text_input("학번")
 name = st.text_input("이름")
 topic = st.text_input("수업 주제", max_chars=80)
 content = st.text_area("수업 내용 (200자 이내)", max_chars=200)
-learning = st.text_area("활동 및 참여내용 (200자 이내)", max_chars=200)
+acting = st.text_area("활동 및 참여내용 (200자 이내)", max_chars=200)
+learning = st.text_area("느낀점, 배운점(오늘 나의 태도 / 협력 / 질문 / 노력 등)(200자 이내)", max_chars=200)
 development = st.text_area("향후 발전 방향 (200자 이내)", max_chars=200)
 
 if st.button("저장하기"):
