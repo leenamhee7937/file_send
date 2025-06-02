@@ -57,13 +57,7 @@ for week_start in range(0, len(dates), 7):
             plan = plan_dict.get(str_date, "")
             weekday = d.weekday()  # 월=0, 토=5, 일=6
 
-            # ✅ 요일별 글자 색상
-            if weekday == 5:
-                color = "#0066cc"  # 토요일 파랑
-            elif weekday == 6:
-                color = "#cc0000"  # 일요일 빨강
-            else:
-                color = "#000000"
+          
 
             # ✅ 오늘 날짜 배경 강조
             bg_color = "#fff9c4" if str_date == today_str else ("#d0e8ff" if plan else "#f0f0f0")
