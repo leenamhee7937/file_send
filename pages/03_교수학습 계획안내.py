@@ -86,7 +86,8 @@ for week_start in range(0, len(dates), 7):
 
 # 클릭된 날짜 가져오기
 query_params = st.query_params
-clicked = query_params.get("clicked_date", [None])[0]
+clicked_list = query_params.get("clicked_date")
+clicked = clicked_list[0] if clicked_list else None
 if clicked:
     st.session_state.clicked_date = clicked
 
