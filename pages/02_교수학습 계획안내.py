@@ -6,7 +6,7 @@ import os
 from io import BytesIO
 
 st.set_page_config(page_title="2025 학습계획표", layout="wide")
-st.title("📘 교수 학습 계획 안내")
+st.title("📅 교수 학습 계획 안내")
 st.markdown("날짜를 클릭하고 일정을 입력한 뒤 **✅ 일정 입력** 버튼을 누르세요.")
 
 # 🔹 CSV 불러오기 + 인코딩 오류 자동 처리
