@@ -3,11 +3,12 @@ import calendar
 import datetime
 import pandas as pd
 import os
+from fpdf import FPDF
 from io import BytesIO
 
 st.set_page_config(page_title="2025 학습계획표", layout="wide")
-st.title("📘 2025년 교수 학습 계획 안내")
-st.markdown("이번 달 교수 학습 계획을 확인하세요.")
+st.title("📘 2025년 학습 계획표 안내")
+st.markdown("날짜를 클릭하고 일정을 입력한 뒤 **✅ 일정 입력** 버튼을 누르세요.")
 
 # 🔹 CSV 불러오기 + 인코딩 오류 자동 처리
 csv_file = "plan.csv"
@@ -25,9 +26,8 @@ else:
 
 plan_dict = dict(zip(df["날짜"], df["계획"]))
 
-# 🔸 현재 날짜, 월 자동 선택
+# 🔸 현재 월 자동 선택
 today = datetime.date.today()
-today_str = str(today)
 default_month = today.month if 3 <= today.month <= 12 else 3
 selected_month = st.selectbox("월 선택", list(range(3, 13)), index=default_month - 3, format_func=lambda x: f"{x}월")
 year = 2025
@@ -57,26 +57,31 @@ for week_start in range(0, len(dates), 7):
             plan = plan_dict.get(str_date, "")
             weekday = d.weekday()  # 월=0, 토=5, 일=6
 
-          # ✅ 요일별 글자 색상 (토: 파랑, 일: 빨강, 평일: 검정)
-if weekday == 5:
-    color = "#0066cc"  # 토요일
-elif weekday == 6:
-    color = "#cc0000"  # 일요일
-else:
-    color = "#000000"  # 평일
-
-            # ✅ 오늘 날짜 배경 강조
-            bg_color = "#fff9c4" if str_date == today_str else ("#d0e8ff" if plan else "#f0f0f0")
+            # 요일별 색상
+            if weekday == 4:
+                color = "#0066cc"  # 토요일
+            elif weekday == 5:
+                color = "#cc0000"  # 일요일
+            else:
+                color = "#000000"
 
             label = f"<span style='color:{color}; font-weight:bold;'>{d.day}</span>"
             short_plan = str(plan)[:12] if plan else ""
 
-            button_html = f"""
-            <button style='background-color:{bg_color};padding:8px;border:none;border-radius:6px;width:100%;cursor:pointer;' 
-                    onclick="window.location.href='?clicked_date={str_date}'">
-                {label}<br><span style='font-size:10px;'>{short_plan}</span>
-            </button>
-            """
+            if plan:
+                button_html = f"""
+                <button style='background-color:#d0e8ff;padding:8px;border:none;border-radius:6px;width:100%;cursor:pointer;' 
+                        onclick="window.location.href='?clicked_date={str_date}'">
+                    {label}<br><span style='font-size:10px;'>{short_plan}</span>
+                </button>
+                """
+            else:
+                button_html = f"""
+                <button style='background-color:#f0f0f0;padding:8px;border:none;border-radius:6px;width:100%;cursor:pointer;' 
+                        onclick="window.location.href='?clicked_date={str_date}'">
+                    {label}
+                </button>
+                """
             cols[i].markdown(button_html, unsafe_allow_html=True)
 
 # 클릭된 날짜 가져오기
@@ -114,17 +119,5 @@ if clicked_date:
         st.warning(f"날짜 파싱 오류: {e}")
 
 
-# 📥 Excel 다운로드
-with st.expander("📊 계획 엑셀 다운로드"):
-    if not df.empty:
-        excel_file = BytesIO()
-        df.to_excel(excel_file, index=False, engine="openpyxl")
-        excel_file.seek(0)
-        st.download_button(
-            label="📥 Excel 다운로드",
-            data=excel_file,
-            file_name="월주교수학습계획.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-    else:
-        st.info("엑셀로 내보낼 일정이 없습니다.")
+
+
