@@ -3,7 +3,6 @@ import calendar
 import datetime
 import pandas as pd
 import os
-from fpdf import FPDF
 from io import BytesIO
 
 st.set_page_config(page_title="2025 학습계획표", layout="wide")
@@ -114,37 +113,6 @@ if clicked_date:
     except Exception as e:
         st.warning(f"날짜 파싱 오류: {e}")
 
-# ✅ PDF 생성 함수 (한글 제거 버전)
-def create_pdf(df):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    pdf.cell(0, 10, "2025 Study Plan", ln=True, align="C")
-    pdf.ln(5)
-
-    for _, row in df.iterrows():
-        date_str = row["날짜"]
-        plan_text = str(row["계획"]).encode("ascii", "ignore").decode()
-        pdf.multi_cell(0, 10, f"{date_str} - {plan_text}")
-        pdf.ln(1)
-
-    pdf_output = BytesIO()
-    pdf.output(pdf_output)
-    pdf_output.seek(0)
-    return pdf_output
-
-# 📥 PDF 다운로드
-with st.expander("📄 계획 PDF 다운로드"):
-    if not df.empty:
-        pdf_file = create_pdf(df.sort_values("날짜"))
-        st.download_button(
-            label="📥 PDF 다운로드",
-            data=pdf_file,
-            file_name="2025_study_plan.pdf",
-            mime="application/pdf"
-        )
-    else:
-        st.info("저장된 일정이 없습니다.")
 
 # 📥 Excel 다운로드
 with st.expander("📊 계획 엑셀 다운로드"):
