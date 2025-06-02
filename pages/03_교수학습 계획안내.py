@@ -121,8 +121,11 @@ if clicked_date:
 def create_pdf(df):
     pdf = FPDF()
     pdf.add_page()
-    pdf.add_font("Nanum", "", "./NotoSansKR-Regular.ttf"", uni=True)
+
+    # ✅ 한글 폰트 등록 (파일명 정확히 지정, 경로도 정확하게)
+    pdf.add_font("Nanum", "", "NotoSansKR-Regular.ttf", uni=True)
     pdf.set_font("Nanum", size=12)
+
     pdf.cell(0, 10, "2025 학습 계획표", ln=True, align="C")
     pdf.ln(5)
 
@@ -136,6 +139,7 @@ def create_pdf(df):
     pdf.output(pdf_output)
     pdf_output.seek(0)
     return pdf_output
+
     
 # PDF 다운로드 버튼
 with st.expander("📄 계획 PDF 다운로드"):
