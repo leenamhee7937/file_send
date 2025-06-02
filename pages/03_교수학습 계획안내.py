@@ -32,9 +32,6 @@ cal = calendar.Calendar()
 dates = [day for day in cal.itermonthdates(year, month) if day.month == month]
 plan_dict = dict(zip(df["날짜"], df["계획"]))
 
-# 날짜 클릭 처리용 변수
-clicked_date = st.session_state.get("clicked_date", None)
-
 # 요일 표시
 st.markdown(f"## 🗓️ {year}년 {month}월")
 weekdays = ["월", "화", "수", "목", "금", "토", "일"]
@@ -42,27 +39,35 @@ cols = st.columns(7)
 for i in range(7):
     cols[i].markdown(f"**{weekdays[i]}**")
 
-# 달력 표시
+# 날짜 클릭 처리용 변수
+query_params = st.query_params
+clicked_date = query_params.get("clicked_date", None)
+
+# 달력 그리기
 for week_start in range(0, len(dates), 7):
     cols = st.columns(7)
     for i in range(7):
         if week_start + i < len(dates):
             d = dates[week_start + i]
-            weekday = d.weekday()  # 월=0, ... 일=6
             str_date = str(d)
             plan_text = plan_dict.get(str_date, "")
-            color = "#000000"  # 기본 검정
 
+            # 요일 색상 처리 (월=0, ..., 일=6)
+            weekday = d.weekday()
             if weekday == 5:  # 토요일
                 color = "#0066cc"  # 파랑
             elif weekday == 6:  # 일요일
                 color = "#cc0000"  # 빨강
+            else:
+                color = "#000000"  # 검정
 
+            # 날짜 표시 텍스트
             label = f"<span style='color:{color}; font-weight:bold;'>{d.day}</span>"
 
+            # 버튼 HTML 생성
             if plan_text:
                 button_html = f"""
-                <button style='background-color:#d0e8ff;padding:8px;border:none;border-radius:5px;width:100%;font-weight:normal;cursor:pointer;' 
+                <button style='background-color:#d0e8ff;padding:8px;border:none;border-radius:5px;width:100%;cursor:pointer;' 
                         onclick="window.location.href='?clicked_date={str_date}'">
                     {label}<br><span style='font-size:10px;'>{plan_text[:10]}</span>
                 </button>
@@ -76,28 +81,25 @@ for week_start in range(0, len(dates), 7):
                 """
             cols[i].markdown(button_html, unsafe_allow_html=True)
 
-# URL 파라미터에서 클릭된 날짜 처리
-query_params = st.experimental_get_query_params()
-if "clicked_date" in query_params:
-    clicked_date = query_params["clicked_date"][0]
-    st.session_state.clicked_date = clicked_date
-else:
-    clicked_date = st.session_state.get("clicked_date", None)
-
 # 입력 UI
 if clicked_date:
-    clicked_dt = datetime.datetime.strptime(clicked_date, "%Y-%m-%d").date()
-    st.markdown(f"### ✍️ {clicked_dt.strftime('%Y년 %m월 %d일')} 학습 계획 입력")
-    prev = plan_dict.get(clicked_date, "")
-    new_plan = st.text_area("학습 계획", value=prev, height=150)
+    try:
+        clicked_dt = datetime.datetime.strptime(clicked_date, "%Y-%m-%d").date()
+    except ValueError:
+        clicked_dt = None
 
-    if st.button("저장", key="save"):
-        df = df[df["날짜"] != clicked_date]
-        df = pd.concat([df, pd.DataFrame([{"날짜": clicked_date, "계획": new_plan}])], ignore_index=True)
-        df.to_csv(SAVE_FILE, index=False, encoding="utf-8-sig")
-        st.success("계획이 저장되었습니다.")
-        st.experimental_set_query_params(clicked_date=clicked_date)
-        st.rerun()
+    if clicked_dt:
+        st.markdown(f"### ✍️ {clicked_dt.strftime('%Y년 %m월 %d일')} 학습 계획 입력")
+        prev = plan_dict.get(clicked_date, "")
+        new_plan = st.text_area("학습 계획", value=prev, height=150)
+
+        if st.button("저장", key="save"):
+            # 저장 처리
+            df = df[df["날짜"] != clicked_date]
+            df = pd.concat([df, pd.DataFrame([{"날짜": clicked_date, "계획": new_plan}])], ignore_index=True)
+            df.to_csv(SAVE_FILE, index=False, encoding="utf-8-sig")
+            st.success("계획이 저장되었습니다.")
+            st.rerun()
 
 # 전체 보기
 with st.expander("📄 전체 계획 보기"):
