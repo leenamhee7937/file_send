@@ -58,9 +58,9 @@ for week_start in range(0, len(dates), 7):
             weekday = d.weekday()  # 월=0, 토=5, 일=6
 
             # 요일별 색상
-            if weekday == 5:
+            if weekday == 4:
                 color = "#0066cc"  # 토요일
-            elif weekday == 6:
+            elif weekday == 5:
                 color = "#cc0000"  # 일요일
             else:
                 color = "#000000"
