@@ -119,7 +119,7 @@ if clicked_date:
 with st.expander("📊 계획 엑셀 다운로드"):
     if not df.empty:
         excel_file = BytesIO()
-        df.to_excel(excel_file, index=False, encoding="utf-8", engine="openpyxl")
+        df.to_excel(excel_file, index=False, engine="openpyxl")
         excel_file.seek(0)
         st.download_button(
             label="📥 Excel 다운로드",
