@@ -118,39 +118,6 @@ if clicked_date:
     except Exception as e:
         st.warning(f"날짜 파싱 오류: {e}")
 
-# PDF 생성 함수
-def create_pdf(df):
-    pdf = FPDF()
-    pdf.add_page()
 
-    # ✅ 한글 폰트 등록 (파일명 정확히 지정, 경로도 정확하게)
-    pdf.add_font("Nanum", "", "NotoSansKR-Regular.ttf", uni=True)
-    pdf.set_font("Nanum", size=12)
-
-    pdf.cell(0, 10, "2025 학습 계획표", ln=True, align="C")
-    pdf.ln(5)
-
-    for _, row in df.iterrows():
-        date_str = row["날짜"]
-        plan_text = row["계획"]
-        pdf.multi_cell(0, 10, f"📅 {date_str} - {plan_text}")
-        pdf.ln(1)
-
-    pdf_output = BytesIO()
-    pdf.output(pdf_output)
-    pdf_output.seek(0)
-    return pdf_output
-
-    
-# PDF 다운로드 버튼
-with st.expander("📄 계획 PDF 다운로드"):
-    if not df.empty:
-        pdf_file = create_pdf(df.sort_values("날짜"))
-        st.download_button(
-            label="📥 PDF 다운로드",
-            data=pdf_file,
-            file_name="2025_학습계획표.pdf",
-            mime="application/pdf"
-        )
 
 
