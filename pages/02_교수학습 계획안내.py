@@ -118,13 +118,14 @@ if clicked_date:
 with st.expander("📊 계획 엑셀 다운로드"):
     if not df.empty:
         excel_file = BytesIO()
-        df.to_excel(excel_file, index=False, encoding="utf-8", engine="openpyxl")
+        df.to_excel(excel_file, index=False, engine="openpyxl")  # ✅ encoding 제거
         excel_file.seek(0)
         st.download_button(
             label="📥 Excel 다운로드",
             data=excel_file,
-            file_name="2025_학습계획표.xlsx",
+            file_name="학습계획표.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
     else:
         st.info("엑셀로 내보낼 일정이 없습니다.")
+
