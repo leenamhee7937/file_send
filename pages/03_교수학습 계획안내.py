@@ -33,21 +33,21 @@ selected_month = st.selectbox("월 선택", list(range(3, 13)), index=default_mo
 year = 2025
 month = selected_month
 
-# 클릭된 날짜 저장용 상태 초기화
+# 클릭된 날짜 상태 초기화
 if "clicked_date" not in st.session_state:
     st.session_state.clicked_date = None
 
-# 요일 헤더
+# 요일 헤더 출력
 weekdays = ["월", "화", "수", "목", "금", "토", "일"]
 cols = st.columns(7)
 for i in range(7):
     cols[i].markdown(f"**{weekdays[i]}**")
 
-# 달력 날짜 생성
-cal = calendar.Calendar(firstweekday=0)  # 월요일 시작
+# 달력 생성
+cal = calendar.Calendar(firstweekday=0)
 dates = [day for day in cal.itermonthdates(year, month) if day.month == month]
 
-# 달력 출력
+# 날짜 버튼 출력
 for week_start in range(0, len(dates), 7):
     cols = st.columns(7)
     for i in range(7):
@@ -55,22 +55,24 @@ for week_start in range(0, len(dates), 7):
             d = dates[week_start + i]
             str_date = str(d)
             plan = plan_dict.get(str_date, "")
-            weekday = d.weekday()
+            weekday = d.weekday()  # 월=0, 토=5, 일=6
 
-            # 요일 색상 지정
+            # 요일별 색상
             if weekday == 5:
-                color = "#0066cc"  # 토
+                color = "#0066cc"  # 토요일
             elif weekday == 6:
-                color = "#cc0000"  # 일
+                color = "#cc0000"  # 일요일
             else:
-                color = "#000000"  # 평일
+                color = "#000000"
 
             label = f"<span style='color:{color}; font-weight:bold;'>{d.day}</span>"
+            short_plan = str(plan)[:12] if plan else ""
+
             if plan:
                 button_html = f"""
                 <button style='background-color:#d0e8ff;padding:8px;border:none;border-radius:6px;width:100%;cursor:pointer;' 
                         onclick="window.location.href='?clicked_date={str_date}'">
-                    {label}<br><span style='font-size:10px;'>{plan[:12]}</span>
+                    {label}<br><span style='font-size:10px;'>{short_plan}</span>
                 </button>
                 """
             else:
@@ -82,14 +84,15 @@ for week_start in range(0, len(dates), 7):
                 """
             cols[i].markdown(button_html, unsafe_allow_html=True)
 
-# 🔹 클릭된 날짜 상태 저장
+# 클릭된 날짜 가져오기
 query_params = st.query_params
 clicked = query_params.get("clicked_date", [None])[0]
 if clicked:
     st.session_state.clicked_date = clicked
 
-# 🔹 일정 입력 UI
 clicked_date = st.session_state.clicked_date
+
+# 일정 입력 폼
 if clicked_date:
     try:
         dt = datetime.datetime.strptime(clicked_date, "%Y-%m-%d").date()
@@ -114,7 +117,7 @@ if clicked_date:
     except Exception as e:
         st.warning(f"날짜 파싱 오류: {e}")
 
-# 🔹 PDF 생성 함수
+# PDF 생성 함수
 def create_pdf(df):
     pdf = FPDF()
     pdf.add_page()
@@ -133,7 +136,7 @@ def create_pdf(df):
     pdf_output.seek(0)
     return pdf_output
 
-# 🔻 PDF 다운로드
+# PDF 다운로드 버튼
 with st.expander("📄 계획 PDF 다운로드"):
     if not df.empty:
         pdf_file = create_pdf(df.sort_values("날짜"))
@@ -146,7 +149,7 @@ with st.expander("📄 계획 PDF 다운로드"):
     else:
         st.info("먼저 계획을 입력하세요.")
 
-# 🔹 전체 계획표 보기
+# 전체 계획표 보기
 with st.expander("📋 전체 계획 보기"):
     if not df.empty:
         st.dataframe(df.sort_values("날짜"), use_container_width=True)
