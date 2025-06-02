@@ -8,41 +8,46 @@ from io import BytesIO
 
 st.set_page_config(page_title="2025 학습계획표", layout="wide")
 st.title("📘 2025년 학습 계획표 안내")
+st.markdown("날짜를 클릭하고 일정을 입력한 뒤 **✅ 일정 입력** 버튼을 누르세요.")
 
-st.markdown("학생 여러분, 날짜를 클릭하고 일정을 입력한 뒤 **✅ 일정 입력** 버튼을 눌러주세요.")
-
-# 🔹 CSV 불러오기 (외부 입력 허용)
+# 🔹 CSV 불러오기 + 인코딩 오류 자동 처리
 csv_file = "plan.csv"
 if os.path.exists(csv_file):
-    df = pd.read_csv(csv_file)
+    try:
+        df = pd.read_csv(csv_file, encoding="utf-8-sig")
+    except UnicodeDecodeError:
+        try:
+            df = pd.read_csv(csv_file, encoding="cp949")
+        except Exception as e:
+            st.error(f"CSV 파일을 읽는 중 오류가 발생했습니다: {e}")
+            df = pd.DataFrame(columns=["날짜", "계획"])
 else:
     df = pd.DataFrame(columns=["날짜", "계획"])
 
-# 📅 날짜-계획 딕셔너리로 변환
 plan_dict = dict(zip(df["날짜"], df["계획"]))
 
-# 🔹 현재 월을 기본으로 선택
+# 🔸 현재 월 자동 선택
 today = datetime.date.today()
 default_month = today.month if 3 <= today.month <= 12 else 3
 selected_month = st.selectbox("월 선택", list(range(3, 13)), index=default_month - 3, format_func=lambda x: f"{x}월")
 year = 2025
 month = selected_month
 
-# 🔹 클릭된 날짜 기억용
+# 클릭된 날짜 저장용 상태 초기화
 if "clicked_date" not in st.session_state:
     st.session_state.clicked_date = None
 
-# 🔹 요일 헤더
+# 요일 헤더
 weekdays = ["월", "화", "수", "목", "금", "토", "일"]
 cols = st.columns(7)
 for i in range(7):
     cols[i].markdown(f"**{weekdays[i]}**")
 
-# 🔹 달력 생성
+# 달력 날짜 생성
 cal = calendar.Calendar(firstweekday=0)  # 월요일 시작
 dates = [day for day in cal.itermonthdates(year, month) if day.month == month]
 
-# 🔹 달력 날짜 버튼 출력
+# 달력 출력
 for week_start in range(0, len(dates), 7):
     cols = st.columns(7)
     for i in range(7):
@@ -50,15 +55,15 @@ for week_start in range(0, len(dates), 7):
             d = dates[week_start + i]
             str_date = str(d)
             plan = plan_dict.get(str_date, "")
-            weekday = d.weekday()  # 월=0, ..., 일=6
+            weekday = d.weekday()
 
-            # ✅ 요일별 색상
-            if weekday == 5:  # 토
-                color = "#0066cc"
-            elif weekday == 6:  # 일
-                color = "#cc0000"
+            # 요일 색상 지정
+            if weekday == 5:
+                color = "#0066cc"  # 토
+            elif weekday == 6:
+                color = "#cc0000"  # 일
             else:
-                color = "#000000"
+                color = "#000000"  # 평일
 
             label = f"<span style='color:{color}; font-weight:bold;'>{d.day}</span>"
             if plan:
@@ -77,7 +82,7 @@ for week_start in range(0, len(dates), 7):
                 """
             cols[i].markdown(button_html, unsafe_allow_html=True)
 
-# 🔹 날짜 클릭 처리
+# 🔹 클릭된 날짜 상태 저장
 query_params = st.query_params
 clicked = query_params.get("clicked_date", [None])[0]
 if clicked:
@@ -106,10 +111,10 @@ if clicked_date:
                 st.session_state.clicked_date = None
                 st.rerun()
 
-    except:
-        st.warning("날짜 형식이 올바르지 않습니다.")
+    except Exception as e:
+        st.warning(f"날짜 파싱 오류: {e}")
 
-# 📥 PDF 다운로드
+# 🔹 PDF 생성 함수
 def create_pdf(df):
     pdf = FPDF()
     pdf.add_page()
@@ -128,6 +133,7 @@ def create_pdf(df):
     pdf_output.seek(0)
     return pdf_output
 
+# 🔻 PDF 다운로드
 with st.expander("📄 계획 PDF 다운로드"):
     if not df.empty:
         pdf_file = create_pdf(df.sort_values("날짜"))
@@ -138,9 +144,9 @@ with st.expander("📄 계획 PDF 다운로드"):
             mime="application/pdf"
         )
     else:
-        st.info("먼저 계획을 작성해 주세요.")
+        st.info("먼저 계획을 입력하세요.")
 
-# 📊 전체 보기
+# 🔹 전체 계획표 보기
 with st.expander("📋 전체 계획 보기"):
     if not df.empty:
         st.dataframe(df.sort_values("날짜"), use_container_width=True)
