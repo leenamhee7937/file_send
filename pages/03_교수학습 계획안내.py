@@ -26,8 +26,9 @@ else:
 
 plan_dict = dict(zip(df["날짜"], df["계획"]))
 
-# 🔸 현재 월 자동 선택
+# 🔸 현재 날짜, 월 자동 선택
 today = datetime.date.today()
+today_str = str(today)
 default_month = today.month if 3 <= today.month <= 12 else 3
 selected_month = st.selectbox("월 선택", list(range(3, 13)), index=default_month - 3, format_func=lambda x: f"{x}월")
 year = 2025
@@ -57,31 +58,26 @@ for week_start in range(0, len(dates), 7):
             plan = plan_dict.get(str_date, "")
             weekday = d.weekday()  # 월=0, 토=5, 일=6
 
-            # 요일별 색상
-            if weekday == 4:
-                color = "#0066cc"  # 토요일
-            elif weekday == 5:
-                color = "#cc0000"  # 일요일
+            # ✅ 요일별 글자 색상
+            if weekday == 5:
+                color = "#0066cc"  # 토요일 파랑
+            elif weekday == 6:
+                color = "#cc0000"  # 일요일 빨강
             else:
                 color = "#000000"
+
+            # ✅ 오늘 날짜 배경 강조
+            bg_color = "#fff9c4" if str_date == today_str else ("#d0e8ff" if plan else "#f0f0f0")
 
             label = f"<span style='color:{color}; font-weight:bold;'>{d.day}</span>"
             short_plan = str(plan)[:12] if plan else ""
 
-            if plan:
-                button_html = f"""
-                <button style='background-color:#d0e8ff;padding:8px;border:none;border-radius:6px;width:100%;cursor:pointer;' 
-                        onclick="window.location.href='?clicked_date={str_date}'">
-                    {label}<br><span style='font-size:10px;'>{short_plan}</span>
-                </button>
-                """
-            else:
-                button_html = f"""
-                <button style='background-color:#f0f0f0;padding:8px;border:none;border-radius:6px;width:100%;cursor:pointer;' 
-                        onclick="window.location.href='?clicked_date={str_date}'">
-                    {label}
-                </button>
-                """
+            button_html = f"""
+            <button style='background-color:{bg_color};padding:8px;border:none;border-radius:6px;width:100%;cursor:pointer;' 
+                    onclick="window.location.href='?clicked_date={str_date}'">
+                {label}<br><span style='font-size:10px;'>{short_plan}</span>
+            </button>
+            """
             cols[i].markdown(button_html, unsafe_allow_html=True)
 
 # 클릭된 날짜 가져오기
@@ -118,6 +114,49 @@ if clicked_date:
     except Exception as e:
         st.warning(f"날짜 파싱 오류: {e}")
 
+# ✅ PDF 생성 함수 (한글 제거 버전)
+def create_pdf(df):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.cell(0, 10, "2025 Study Plan", ln=True, align="C")
+    pdf.ln(5)
 
+    for _, row in df.iterrows():
+        date_str = row["날짜"]
+        plan_text = str(row["계획"]).encode("ascii", "ignore").decode()
+        pdf.multi_cell(0, 10, f"{date_str} - {plan_text}")
+        pdf.ln(1)
 
+    pdf_output = BytesIO()
+    pdf.output(pdf_output)
+    pdf_output.seek(0)
+    return pdf_output
 
+# 📥 PDF 다운로드
+with st.expander("📄 계획 PDF 다운로드"):
+    if not df.empty:
+        pdf_file = create_pdf(df.sort_values("날짜"))
+        st.download_button(
+            label="📥 PDF 다운로드",
+            data=pdf_file,
+            file_name="2025_study_plan.pdf",
+            mime="application/pdf"
+        )
+    else:
+        st.info("저장된 일정이 없습니다.")
+
+# 📥 Excel 다운로드
+with st.expander("📊 계획 엑셀 다운로드"):
+    if not df.empty:
+        excel_file = BytesIO()
+        df.to_excel(excel_file, index=False, encoding="utf-8", engine="openpyxl")
+        excel_file.seek(0)
+        st.download_button(
+            label="📥 Excel 다운로드",
+            data=excel_file,
+            file_name="2025_학습계획표.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    else:
+        st.info("엑셀로 내보낼 일정이 없습니다.")
