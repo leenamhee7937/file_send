@@ -121,7 +121,8 @@ if clicked_date:
 def create_pdf(df):
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial", size=12)
+    pdf.add_font("Nanum", "", "./fonts/NanumGothic.ttf", uni=True)
+    pdf.set_font("Nanum", size=12)
     pdf.cell(0, 10, "2025 학습 계획표", ln=True, align="C")
     pdf.ln(5)
 
@@ -135,7 +136,7 @@ def create_pdf(df):
     pdf.output(pdf_output)
     pdf_output.seek(0)
     return pdf_output
-
+    
 # PDF 다운로드 버튼
 with st.expander("📄 계획 PDF 다운로드"):
     if not df.empty:
@@ -146,12 +147,5 @@ with st.expander("📄 계획 PDF 다운로드"):
             file_name="2025_학습계획표.pdf",
             mime="application/pdf"
         )
-    else:
-        st.info("먼저 계획을 입력하세요.")
 
-# 전체 계획표 보기
-with st.expander("📋 전체 계획 보기"):
-    if not df.empty:
-        st.dataframe(df.sort_values("날짜"), use_container_width=True)
-    else:
-        st.info("아직 저장된 계획이 없습니다.")
+
