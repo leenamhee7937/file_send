@@ -3,12 +3,11 @@ import calendar
 import datetime
 import pandas as pd
 import os
-from fpdf import FPDF
 from io import BytesIO
 
 st.set_page_config(page_title="2025 학습계획표", layout="wide")
-st.title("📘 2025년 학습 계획표 안내")
-st.markdown("날짜를 클릭하고 일정을 입력한 뒤 **✅ 일정 입력** 버튼을 누르세요.")
+st.title("📘 2025년 교수 학습 계획 안내")
+st.markdown("이번 달 교수 학습 계획을 확인하세요.")
 
 # 🔹 CSV 불러오기 + 인코딩 오류 자동 처리
 csv_file = "plan.csv"
